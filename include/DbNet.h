@@ -1,5 +1,4 @@
-#ifndef __OCR_DBNET_H__
-#define __OCR_DBNET_H__
+#pragma once
 
 #include "OcrStruct.h"
 #include <onnxruntime_cxx_api.h>
@@ -29,6 +28,3 @@ private:
 	const float meanValues[3] = { 0.485 * 255, 0.456 * 255, 0.406 * 255 };
 	const float normValues[3] = { 1.0 / 0.229 / 255.0, 1.0 / 0.224 / 255.0, 1.0 / 0.225 / 255.0 };
 };
-
-
-#endif //__OCR_DBNET_H__

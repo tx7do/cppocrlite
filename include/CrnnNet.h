@@ -1,5 +1,4 @@
-#ifndef __OCR_CRNNNET_H__
-#define __OCR_CRNNNET_H__
+#pragma once
 
 #include "OcrStruct.h"
 #include <onnxruntime_cxx_api.h>
@@ -37,6 +36,3 @@ private:
 
 	TextLine getTextLine(const cv::Mat& src);
 };
-
-
-#endif //__OCR_CRNNNET_H__

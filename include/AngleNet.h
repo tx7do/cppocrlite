@@ -1,5 +1,4 @@
-#ifndef __OCR_ANGLENET_H__
-#define __OCR_ANGLENET_H__
+#pragma once
 
 #include "OcrStruct.h"
 #include <onnxruntime_cxx_api.h>
@@ -36,6 +35,3 @@ private:
 
 	Angle getAngle(cv::Mat& src);
 };
-
-
-#endif //__OCR_ANGLENET_H__

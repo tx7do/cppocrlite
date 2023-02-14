@@ -1,6 +1,6 @@
 #include "OcrLite.h"
 #include "OcrUtils.h"
-#include <stdarg.h> //windows&linux
+#include <cstdarg> //windows&linux
 
 OcrLite::OcrLite()
 {
@@ -157,12 +157,12 @@ OcrResult OcrLite::detect(const char* path, const char* imgName,
 	cv::Mat& src, cv::Rect& originRect, ScaleParam& scale,
 	float boxScoreThresh, float boxThresh, float unClipRatio, bool doAngle, bool mostAngle)
 {
-
 	cv::Mat textBoxPaddingImg = src.clone();
 	int thickness = getThickness(src);
 
 	Logger("=====Start detect=====\n");
-	Logger("ScaleParam(sw:%d,sh:%d,dw:%d,dh:%d,%f,%f)\n", scale.srcWidth, scale.srcHeight,
+	Logger("ScaleParam(sw:%d,sh:%d,dw:%d,dh:%d,%f,%f)\n",
+		scale.srcWidth, scale.srcHeight,
 		scale.dstWidth, scale.dstHeight,
 		scale.ratioWidth, scale.ratioHeight);
 

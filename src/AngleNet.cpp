@@ -65,7 +65,6 @@ Angle scoreToAngle(const std::vector<float>& outputData)
 
 Angle AngleNet::getAngle(cv::Mat& src)
 {
-
 	std::vector<float> inputTensorValues = substractMeanNormalize(src, meanValues, normValues);
 
 	std::array<int64_t, 4> inputShape{ 1, src.channels(), src.rows, src.cols };

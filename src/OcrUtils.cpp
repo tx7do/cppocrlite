@@ -1,6 +1,5 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
-#include <numeric>
 #include "OcrUtils.h"
 #include "clipper.hpp"
 
@@ -13,7 +12,9 @@ double getCurrentTime()
 std::wstring strToWstr(std::string str)
 {
 	if (str.length() == 0)
+	{
 		return L"";
+	}
 	std::wstring wstr;
 	wstr.assign(str.begin(), str.end());
 	return wstr;
@@ -76,9 +77,7 @@ std::vector<cv::Point2f> getBox(const cv::RotatedRect& rect)
 {
 	cv::Point2f vertices[4];
 	rect.points(vertices);
-	//std::vector<cv::Point2f> ret(4);
 	std::vector<cv::Point2f> ret2(vertices, vertices + sizeof(vertices) / sizeof(vertices[0]));
-	//memcpy(vertices, &ret[0], ret.size() * sizeof(ret[0]));
 	return ret2;
 }
 
@@ -94,8 +93,9 @@ void drawTextBox(cv::Mat& boxImg, cv::RotatedRect& rect, int thickness)
 	cv::Point2f vertices[4];
 	rect.points(vertices);
 	for (int i = 0; i < 4; i++)
+	{
 		cv::line(boxImg, vertices[i], vertices[(i + 1) % 4], cv::Scalar(0, 0, 255), thickness);
-	//cv::polylines(srcmat, textpoint, true, cv::Scalar(0, 255, 0), 2);
+	}
 }
 
 void drawTextBox(cv::Mat& boxImg, const std::vector<cv::Point>& box, int thickness)
@@ -275,39 +275,26 @@ float boxScoreFast(const cv::Mat& inMat, const std::vector<cv::Point>& inBox)
 	int maxX = -1, minX = 1000000, maxY = -1, minY = 1000000;
 	for (auto& i : box)
 	{
-		if (maxX < i.x)
-			maxX = i.x;
-		if (minX > i.x)
-			minX = i.x;
-		if (maxY < i.y)
-			maxY = i.y;
-		if (minY > i.y)
-			minY = i.y;
+		if (maxX < i.x) maxX = i.x;
+		if (minX > i.x) minX = i.x;
+		if (maxY < i.y) maxY = i.y;
+		if (minY > i.y) minY = i.y;
 	}
 	maxX = (std::min)((std::max)(maxX, 0), width - 1);
 	minX = (std::max)((std::min)(minX, width - 1), 0);
 	maxY = (std::min)((std::max)(maxY, 0), height - 1);
 	minY = (std::max)((std::min)(minY, height - 1), 0);
 
-	for (size_t i = 0; i < box.size(); ++i)
+	for (auto& i : box)
 	{
-		box[i].x = box[i].x - minX;
-		box[i].y = box[i].y - minY;
+		i.x = i.x - minX;
+		i.y = i.y - minY;
 	}
 
 	std::vector<std::vector<cv::Point>> maskBox;
 	maskBox.push_back(box);
 	cv::Mat maskMat(maxY - minY + 1, maxX - minX + 1, CV_8UC1, cv::Scalar(0, 0, 0));
 	cv::fillPoly(maskMat, maskBox, cv::Scalar(1, 1, 1), 1);
-
-	// 	cv::Mat normat;
-	// 	cv::normalize(maskMat, normat, 255, 0, cv::NORM_MINMAX);
-	//
-	// 	cv::Mat maskbinmat;
-	// 	normat.convertTo(maskbinmat, CV_8UC1, 1);
-	// 	imwrite("subbin.jpg", maskbinmat);
-
-	//std::cout << inMat << std::endl;
 
 	return cv::mean(inMat(cv::Rect(cv::Point(minX, minY), cv::Point(maxX + 1, maxY + 1))).clone(),
 		maskMat).val[0];

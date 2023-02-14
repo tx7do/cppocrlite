@@ -1,5 +1,4 @@
-#ifndef __OCR_LITE_H__
-#define __OCR_LITE_H__
+#pragma once
 
 #include "opencv2/core.hpp"
 #include <onnxruntime_cxx_api.h>
@@ -51,5 +50,3 @@ private:
 		float boxScoreThresh = 0.6f, float boxThresh = 0.3f,
 		float unClipRatio = 2.0f, bool doAngle = true, bool mostAngle = true);
 };
-
-#endif //__OCR_LITE_H__
