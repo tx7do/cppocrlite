@@ -32,12 +32,22 @@ sudo chown -R `whoami` /opt/onnxruntime
 ## Build
 
 ```shell
-# generate make files
-cmake .
-
 # build Release version
+mkdir cmake-build-release
+cd cmake-build-release && cmake .. -DCMAKE_BUILD_TYPE=Release
 cmake --build . --config Release --target cppocrlite -- -j 12
 
 # build Debug version
+mkdir cmake-build-debug
+cd cmake-build-debug && cmake .. -DCMAKE_BUILD_TYPE=Debug
 cmake --build . --config Debug --target cppocrlite -- -j 12
+
+# install
+sudo cmake --install .
+```
+
+or execute shell script:
+
+```shell
+./build.sh
 ```

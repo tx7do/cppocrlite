@@ -57,3 +57,15 @@ add_library(${PROJECT_NAME} SHARED ${OCR_COMPILE_CODE})
 target_include_directories(${PROJECT_NAME} PRIVATE /opt/onnxruntime/include ${OnnxRuntime_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} ${OnnxRuntime_LIBS} ${OpenCV_LIBS} ${OpenMP_CXX_LIB_NAMES})
+
+file(GLOB OCR_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
+file(GLOB OCR_LIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/*.so)
+install(
+        FILES ${OCR_INCLUDE}
+        DESTINATION ${PROJECT_NAME}/include
+)
+install(
+        FILES ${OCR_LIB}
+        PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
+        DESTINATION ${PROJECT_NAME}/lib
+)
