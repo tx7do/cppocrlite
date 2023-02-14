@@ -9,6 +9,9 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 # 设置静态库的输出目录
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
+# For debug libs and exes, add "-d" postfix
+set(CMAKE_DEBUG_POSTFIX "d")
+
 add_definitions(-DUNICODE -D_UNICODE)
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions("-Wall -g -O0")
@@ -19,6 +22,7 @@ endif ()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # source
+file(GLOB OCR_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
 file(GLOB OCR_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 set(OCR_COMPILE_CODE ${OCR_SRC})
 
@@ -48,10 +52,8 @@ set(OnnxRuntime_LIBS, "/opt/onnxruntime/lib")
 message(STATUS "OnnxRuntime_LIBS: ${OnnxRuntime_LIBS}")
 message(STATUS "OnnxRuntime_INCLUDE_DIRS: ${OnnxRuntime_INCLUDE_DIRS}")
 
-message(STATUS "OCR_COMPILE_CODE: ${OCR_COMPILE_CODE}")
+add_library(${PROJECT_NAME} SHARED ${OCR_COMPILE_CODE})
 
-add_library(cppocrlite SHARED ${OCR_COMPILE_CODE})
+target_include_directories(${PROJECT_NAME} PRIVATE /opt/onnxruntime/include ${OnnxRuntime_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
-target_include_directories(cppocrlite PRIVATE /opt/onnxruntime/include ${OnnxRuntime_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
-
-target_link_libraries(cppocrlite ${OnnxRuntime_LIBS} ${OpenCV_LIBS} ${OpenMP_CXX_LIB_NAMES})
+target_link_libraries(${PROJECT_NAME} ${OnnxRuntime_LIBS} ${OpenCV_LIBS} ${OpenMP_CXX_LIB_NAMES})

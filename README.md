@@ -28,3 +28,16 @@ sudo mv onnxruntime-linux-x64-1.14.0 /opt/onnxruntime
 
 sudo chown -R `whoami` /opt/onnxruntime
 ```
+
+## Build
+
+```shell
+# generate make files
+cmake .
+
+# build Release version
+cmake --build . --config Release --target cppocrlite -- -j 12
+
+# build Debug version
+cmake --build . --config Debug --target cppocrlite -- -j 12
+```
