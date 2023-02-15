@@ -52,5 +52,12 @@ cmake --install .
 or execute shell script:
 
 ```shell
-./build.sh
+cd script && ./build.sh
+```
+
+check installation state:
+
+```shell
+pkg-config --cflags --libs onnxruntime
+pkg-config --cflags --libs cppocrlite
 ```
