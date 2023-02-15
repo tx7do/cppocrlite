@@ -43,7 +43,10 @@ cd cmake-build-debug && cmake .. -DCMAKE_BUILD_TYPE=Debug
 cmake --build . --config Debug --target cppocrlite -- -j 12
 
 # install
-sudo cmake --install .
+sudo chmod 757 /usr/local
+sudo chmod 757 /usr/local/lib
+sudo chmod 757 /usr/local/lib/pkgconfig
+cmake --install .
 ```
 
 or execute shell script:
