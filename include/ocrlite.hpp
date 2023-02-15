@@ -2,10 +2,10 @@
 
 #include "opencv2/core.hpp"
 #include <onnxruntime_cxx_api.h>
-#include "OcrStruct.h"
-#include "DbNet.h"
-#include "AngleNet.h"
-#include "CrnnNet.h"
+#include "ocr_struct.hpp"
+#include "db_net.hpp"
+#include "angle_net.hpp"
+#include "crnn_net.hpp"
 
 class OcrLite
 {

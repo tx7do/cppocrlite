@@ -1,5 +1,5 @@
-#include "AngleNet.h"
-#include "OcrUtils.h"
+#include "angle_net.hpp"
+#include "ocr_utils.hpp"
 #include <numeric>
 
 AngleNet::AngleNet()

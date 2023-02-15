@@ -1,6 +1,6 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
-#include "OcrUtils.h"
+#include "ocr_utils.hpp"
 #include "clipper.hpp"
 
 double getCurrentTime()

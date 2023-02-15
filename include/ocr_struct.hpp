@@ -2,7 +2,7 @@
 
 #include "opencv2/core.hpp"
 #include <vector>
-#include "OcrLitePort.h"
+#include "ocrlite_port.hpp"
 
 struct ScaleParam
 {

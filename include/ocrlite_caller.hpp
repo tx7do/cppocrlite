@@ -3,8 +3,8 @@
 #include <memory>
 #include <string>
 
-#include "OcrLitePort.h"
-#include "OcrStruct.h"
+#include "ocrlite_port.hpp"
+#include "ocr_struct.hpp"
 
 namespace cv
 {
@@ -36,7 +36,6 @@ public:
 	OcrResult detect(const std::string& dir, const std::string& file,
 		int padding, int maxSideLen,
 		float boxScoreThresh, float boxThresh, float unClipRatio, bool doAngle, bool mostAngle);
-
 
 private:
 	std::shared_ptr<OcrLite> m_ocrlite_ptr;

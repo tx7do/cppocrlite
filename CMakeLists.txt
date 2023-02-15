@@ -1,6 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(cppocrlite)
+project(cppocrlite
+        LANGUAGES CXX
+        DESCRIPTION "OcrLite library"
+        VERSION 1.0.0
+        )
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -18,13 +22,6 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
 else ()
     add_definitions("-Wall")
 endif ()
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-# source
-file(GLOB OCR_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
-file(GLOB OCR_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-set(OCR_COMPILE_CODE ${OCR_SRC})
 
 # OpenMP
 find_package(OpenMP REQUIRED)
@@ -46,26 +43,38 @@ else ()
     message(FATAL_ERROR "opencv Not Found!")
 endif (OpenCV_FOUND)
 
-# OnnxRuntime
-set(OnnxRuntime_INCLUDE_DIRS, "/opt/onnxruntime/include")
-set(OnnxRuntime_LIBS, "/opt/onnxruntime/lib")
-message(STATUS "OnnxRuntime_LIBS: ${OnnxRuntime_LIBS}")
-message(STATUS "OnnxRuntime_INCLUDE_DIRS: ${OnnxRuntime_INCLUDE_DIRS}")
+###############################################
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+# source
+file(GLOB OCR_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp)
+file(GLOB OCR_SRC ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+set(OCR_COMPILE_CODE ${OCR_SRC})
 
 add_library(${PROJECT_NAME} SHARED ${OCR_COMPILE_CODE})
 
-target_include_directories(${PROJECT_NAME} PRIVATE /opt/onnxruntime/include ${OnnxRuntime_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE /usr/local/onnxruntime/include ${OpenCV_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} ${OnnxRuntime_LIBS} ${OpenCV_LIBS} ${OpenMP_CXX_LIB_NAMES})
+target_link_libraries(${PROJECT_NAME} -lonnxruntime ${OpenCV_LIBS} ${OpenMP_CXX_LIB_NAMES})
 
-file(GLOB OCR_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include/*.h)
-file(GLOB OCR_LIB ${CMAKE_CURRENT_SOURCE_DIR}/lib/*.so)
+configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
+
+# copy header files.
 install(
-        FILES ${OCR_INCLUDE}
+        FILES ${OCR_HEADER}
         DESTINATION ${PROJECT_NAME}/include
 )
+
+# copy so file.
 install(
-        FILES ${OCR_LIB}
+        TARGETS ${PROJECT_NAME}
         PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ
-        DESTINATION ${PROJECT_NAME}/lib
+        LIBRARY DESTINATION lib
+)
+
+# copy pkgconfig file.
+install(
+        FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+        DESTINATION lib/pkgconfig
 )

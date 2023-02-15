@@ -1,5 +1,5 @@
-#include "CrnnNet.h"
-#include "OcrUtils.h"
+#include "crnn_net.hpp"
+#include "ocr_utils.hpp"
 #include <fstream>
 #include <numeric>
 

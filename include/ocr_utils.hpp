@@ -1,7 +1,7 @@
 #pragma once
 
 #include <opencv2/core.hpp>
-#include "OcrStruct.h"
+#include "ocr_struct.hpp"
 #include <onnxruntime_cxx_api.h>
 #include <numeric>
 #include <sys/stat.h>

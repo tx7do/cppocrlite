@@ -1,6 +1,6 @@
-#include "OcrLite.h"
-#include "OcrUtils.h"
-#include <cstdarg> //windows&linux
+#include "ocrlite.hpp"
+#include "ocr_utils.hpp"
+#include <cstdarg> // windows & linux
 
 OcrLite::OcrLite()
 {

@@ -1,5 +1,5 @@
-#include "DbNet.h"
-#include "OcrUtils.h"
+#include "db_net.hpp"
+#include "ocr_utils.hpp"
 
 DbNet::DbNet()
 {
