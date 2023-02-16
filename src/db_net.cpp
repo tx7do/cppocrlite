@@ -1,9 +1,9 @@
 #include "db_net.hpp"
 #include "ocr_utils.hpp"
 
-const float DbNet::MEAN_VALUES[3] = { 0.485 * 255, 0.456 * 255, 0.406 * 255 };
+const float DbNet::MEAN_VALUES[3] = { 0.485f * 255, 0.456f * 255, 0.406f * 255 };
 
-const float DbNet::NORM_VALUES[3] = { 1.0 / 0.229 / 255.0, 1.0 / 0.224 / 255.0, 1.0 / 0.225 / 255.0 };
+const float DbNet::NORM_VALUES[3] = { 1.0f / 0.229f / 255.0f, 1.0f / 0.224f / 255.0f, 1.0f / 0.225f / 255.0f };
 
 DbNet::DbNet()
 	: Session("DbNet", ORT_LOGGING_LEVEL_ERROR)
@@ -59,7 +59,7 @@ std::vector<TextBox> DbNet::findRsBoxes(const cv::Mat& fMapMat, const cv::Mat& n
 	for (const auto& contour : contours)
 	{
 		float minSideLen, perimeter;
-		std::vector<cv::Point> minBox = getMinBoxes(contour, minSideLen, perimeter);
+		auto minBox = getMinBoxes(contour, minSideLen, perimeter);
 		if (minSideLen < minArea)
 		{
 			continue;
@@ -70,8 +70,8 @@ std::vector<TextBox> DbNet::findRsBoxes(const cv::Mat& fMapMat, const cv::Mat& n
 			continue;
 		}
 		//---use clipper start---
-		std::vector<cv::Point> clipBox = unClip(minBox, perimeter, unClipRatio);
-		std::vector<cv::Point> clipMinBox = getMinBoxes(clipBox, minSideLen, perimeter);
+		auto clipBox = unClip(minBox, perimeter, unClipRatio);
+		auto clipMinBox = getMinBoxes(clipBox, minSideLen, perimeter);
 		//---use clipper end---
 
 		if (minSideLen < minArea + 2)
@@ -81,10 +81,10 @@ std::vector<TextBox> DbNet::findRsBoxes(const cv::Mat& fMapMat, const cv::Mat& n
 
 		for (auto& j : clipMinBox)
 		{
-			j.x = (j.x / (int)s.ratioWidth);
+			j.x = (j.x / s.ratioWidth);
 			j.x = (std::min)((std::max)(j.x, 0), s.srcWidth);
 
-			j.y = (j.y / (int)s.ratioHeight);
+			j.y = (j.y / s.ratioHeight);
 			j.y = (std::min)((std::max)(j.y, 0), s.srcHeight);
 		}
 

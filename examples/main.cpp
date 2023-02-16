@@ -4,15 +4,14 @@
 int main(int argc, char** argv)
 {
 	std::string
-		modelsDir("../models/"),
-		modelDetPath("dbnet.onnx"),
-		modelClsPath("angle_net.onnx"),
-		modelRecPath("crnn_lite_lstm.onnx"),
-		keysPath("keys.txt");
+		modelDetPath("../models/dbnet.onnx"),
+		modelClsPath("../models/angle_net.onnx"),
+		modelRecPath("../models/crnn_lite_lstm.onnx"),
+		keysPath("../models/keys.txt");
 
 	std::string
 		imgDir("_fixtures/"),
-		imgName("1.jpg");
+		imgName("2.jpg");
 
 	int numThread = 4;
 
@@ -20,7 +19,7 @@ int main(int argc, char** argv)
 	int maxSideLen = 1024;
 	float boxScoreThresh = 0.6f;
 	float boxThresh = 0.3f;
-	float unClipRatio = 2.0f;
+	float unClipRatio = 2.6f;
 	bool doAngle = true;
 	bool mostAngle = true;
 

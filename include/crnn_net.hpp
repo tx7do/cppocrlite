@@ -31,4 +31,5 @@ private:
 	static const float NORM_VALUES[3];
 
 	static const int DST_HEIGHT;
+	static const int KEY_COLS;
 };

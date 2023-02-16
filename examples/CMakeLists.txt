@@ -18,11 +18,16 @@ file(GLOB DIR_EXE_SRCS ./*.cpp)
 # 构建可执行文件
 add_executable(${PROJECT_NAME} ${DIR_EXE_SRCS})
 
+target_include_directories(${PROJECT_NAME} PRIVATE /usr/local/onnxruntime/include ${OpenCV_INCLUDE_DIRS})
+
 # 指定目标链接的库
 target_link_libraries(
         ${PROJECT_NAME}
         PRIVATE
         cppocrlite
+        onnxruntime
+        ${OpenCV_LIBS}
+        ${OpenMP_CXX_LIB_NAMES}
         dl
         rt
 )

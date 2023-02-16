@@ -2,9 +2,9 @@
 #include "ocr_utils.hpp"
 #include <numeric>
 
-const float AngleNet::MEAN_VALUES[3] = { 127.5, 127.5, 127.5 };
+const float AngleNet::MEAN_VALUES[3] = { 127.5f, 127.5f, 127.5f };
 
-const float AngleNet::NORM_VALUES[3] = { 1.0 / 127.5, 1.0 / 127.5, 1.0 / 127.5 };
+const float AngleNet::NORM_VALUES[3] = { 1.0f / 127.5f, 1.0f / 127.5f, 1.0f / 127.5f };
 
 const int AngleNet::ANGLE_DST_WIDTH = 192;
 

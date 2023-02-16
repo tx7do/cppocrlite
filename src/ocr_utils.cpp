@@ -208,7 +208,7 @@ cv::Mat adjustTargetImg(cv::Mat& src, int dstWidth, int dstHeight)
 	return srcFit;
 }
 
-bool cvPointCompare(const cv::Point& a, const cv::Point& b)
+bool cvPointCompare(const cv::Point2f& a, const cv::Point2f& b)
 {
 	return a.x < b.x;
 }
@@ -296,7 +296,7 @@ float boxScoreFast(const cv::Mat& inMat, const std::vector<cv::Point>& inBox)
 	cv::Mat maskMat(maxY - minY + 1, maxX - minX + 1, CV_8UC1, cv::Scalar(0, 0, 0));
 	cv::fillPoly(maskMat, maskBox, cv::Scalar(1, 1, 1), 1);
 
-	return cv::mean(inMat(cv::Rect(cv::Point(minX, minY), cv::Point(maxX + 1, maxY + 1))).clone(),
+	return cv::mean(inMat(cv::Rect(cv::Point2f(minX, minY), cv::Point(maxX + 1, maxY + 1))).clone(),
 		maskMat).val[0];
 }
 

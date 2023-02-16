@@ -9,11 +9,12 @@ inline static size_t argmax(ForwardIterator first, ForwardIterator last)
 	return std::distance(first, std::max_element(first, last));
 }
 
-const float CrnnNet::MEAN_VALUES[3] = { 127.5, 127.5, 127.5 };
+const float CrnnNet::MEAN_VALUES[3] = { 127.5f, 127.5f, 127.5f };
 
-const float CrnnNet::NORM_VALUES[3] = { 1.0 / 127.5, 1.0 / 127.5, 1.0 / 127.5 };
+const float CrnnNet::NORM_VALUES[3] = { 1.0f / 127.5f, 1.0f / 127.5f, 1.0f / 127.5f };
 
 const int CrnnNet::DST_HEIGHT = 32;
+const int CrnnNet::KEY_COLS = 5531;
 
 CrnnNet::CrnnNet(bool isOutputDebugImg)
 	: Session("CrnnNet", ORT_LOGGING_LEVEL_ERROR), _isOutputDebugImg(isOutputDebugImg)
@@ -42,7 +43,7 @@ bool CrnnNet::loadKeys(const std::string& keysPath)
 		_keys.push_back(strLine);
 	}
 
-	if (_keys.size() != 5531)
+	if (_keys.size() != KEY_COLS)
 	{
 		fprintf(stderr, "missing keys\n");
 		return false;

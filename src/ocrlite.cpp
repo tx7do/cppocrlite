@@ -76,7 +76,7 @@ void OcrLite::log(const char* format, ...)
 	vsprintf(buffer, format, args);
 	va_end(args);
 	if (_isOutputConsole) printf("%s", buffer);
-	if (_isOutputResultTxt) fprintf(_resultTxt, "%s", buffer);
+	if (_isOutputResultTxt && _resultTxt != nullptr) fprintf(_resultTxt, "%s", buffer);
 	free(buffer);
 }
 

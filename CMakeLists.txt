@@ -56,7 +56,7 @@ add_library(${PROJECT_NAME} SHARED ${OCR_COMPILE_CODE})
 
 target_include_directories(${PROJECT_NAME} PRIVATE /usr/local/onnxruntime/include ${OpenCV_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} -lonnxruntime ${OpenCV_LIBS} ${OpenMP_CXX_LIB_NAMES})
+target_link_libraries(${PROJECT_NAME} onnxruntime ${OpenCV_LIBS} ${OpenMP_CXX_LIB_NAMES})
 
 configure_file(${PROJECT_NAME}.pc.in ${PROJECT_NAME}.pc @ONLY)
 
