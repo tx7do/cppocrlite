@@ -5,10 +5,10 @@
 
 double getCurrentTime()
 {
-	return (static_cast<double>(cv::getTickCount())) / cv::getTickFrequency() * 1000;//单位毫秒
+	return (static_cast<double>(cv::getTickCount())) / cv::getTickFrequency() * 1000; // 单位毫秒
 }
 
-//onnxruntime init windows
+// onnxruntime init windows
 std::wstring strToWstr(std::string str)
 {
 	if (str.length() == 0)
@@ -220,7 +220,7 @@ std::vector<cv::Point> getMinBoxes(const std::vector<cv::Point>& inVec, float& m
 	cv::Mat boxPoints2f;
 	cv::boxPoints(textRect, boxPoints2f);
 
-	float* p1 = (float*)boxPoints2f.data;
+	auto* p1 = (float*)boxPoints2f.data;
 	std::vector<cv::Point> tmpVec;
 	for (int i = 0; i < 4; ++i, p1 += 2)
 	{
@@ -358,69 +358,6 @@ std::vector<int> getAngleIndexes(std::vector<Angle>& angles)
 		angleIndexes.push_back(angle.index);
 	}
 	return angleIndexes;
-}
-
-std::vector<std::string> getInputNames(Ort::Session* session)
-{
-	Ort::AllocatorWithDefaultOptions allocator;
-	size_t numInputNodes = session->GetInputCount();
-	std::vector<std::string> inputNodeNames;
-	std::vector<int64_t> inputNodeDims;
-
-	inputNodeNames.reserve(numInputNodes);
-
-	for (size_t i = 0; i < numInputNodes; i++)
-	{
-		// print input node names
-		auto inputName = session->GetInputNameAllocated(i, allocator);
-		printf("InputName[%zu]=%s\n", i, inputName.get());
-		inputNodeNames.push_back(inputName.get());
-	}
-	return inputNodeNames;
-}
-
-std::vector<std::string> getOutputNames(Ort::Session* session)
-{
-	Ort::AllocatorWithDefaultOptions allocator;
-	size_t numOutputNodes = session->GetOutputCount();
-	std::vector<std::string> outputNodeNames;
-
-	outputNodeNames.reserve(numOutputNodes);
-
-	for (size_t i = 0; i < numOutputNodes; i++)
-	{
-		// print input node names
-		auto outputName = session->GetOutputNameAllocated(i, allocator);
-		printf("OutputName[%zu]=%s\n", i, outputName.get());
-		outputNodeNames.push_back(outputName.get());
-	}
-	return outputNodeNames;
-}
-
-void getInputName(Ort::Session* session, char*& inputName)
-{
-	size_t numInputNodes = session->GetInputCount();
-	if (numInputNodes > 0)
-	{
-		Ort::AllocatorWithDefaultOptions allocator;
-		{
-			auto t = session->GetInputNameAllocated(0, allocator);
-			inputName = my_strdup(t.get());
-		}
-	}
-}
-
-void getOutputName(Ort::Session* session, char*& outputName)
-{
-	size_t numOutputNodes = session->GetInputCount();
-	if (numOutputNodes > 0)
-	{
-		Ort::AllocatorWithDefaultOptions allocator;
-		{
-			auto t = session->GetOutputNameAllocated(0, allocator);
-			outputName = my_strdup(t.get());
-		}
-	}
 }
 
 void saveImg(cv::Mat& img, const char* imgPath)

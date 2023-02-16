@@ -3,28 +3,23 @@
 #include "ocr_struct.hpp"
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/opencv.hpp>
+#include "ocr_session.hpp"
 
-class DbNet
+class DbNet : public Session
 {
 public:
 	DbNet();
 	~DbNet();
 
-	void setNumThread(int numOfThread);
-
-	void initModel(const std::string& pathStr);
-
+public:
 	std::vector<TextBox> getTextBoxes(cv::Mat& src, ScaleParam& s, float boxScoreThresh,
 		float boxThresh, float unClipRatio);
 
 private:
-	Ort::Session* session;
-	Ort::Env env = Ort::Env(ORT_LOGGING_LEVEL_ERROR, "DbNet");
-	Ort::SessionOptions sessionOptions = Ort::SessionOptions();
-	int numThread = 0;
-	char* inputName;
-	char* outputName;
+	static std::vector<TextBox> findRsBoxes(const cv::Mat& fMapMat, const cv::Mat& norfMapMat, ScaleParam& s,
+		float boxScoreThresh, float unClipRatio);
 
-	const float meanValues[3] = { 0.485 * 255, 0.456 * 255, 0.406 * 255 };
-	const float normValues[3] = { 1.0 / 0.229 / 255.0, 1.0 / 0.224 / 255.0, 1.0 / 0.225 / 255.0 };
+private:
+	static const float MEAN_VALUES[3];
+	static const float NORM_VALUES[3];
 };

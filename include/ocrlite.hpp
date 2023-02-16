@@ -13,17 +13,20 @@ public:
 	OcrLite();
 	~OcrLite();
 
+public:
 	void setNumThread(int numOfThread);
-
-	void initLogger(bool isConsole, bool isPartImg, bool isResultImg);
-
-	void enableResultTxt(const char* path, const char* imgName);
 
 	bool initModels(const std::string& detPath, const std::string& clsPath,
 		const std::string& recPath, const std::string& keysPath);
 
-	void Logger(const char* format, ...);
+public:
+	void initLogger(bool isConsole, bool isPartImg, bool isResultImg);
 
+	void enableResultTxt(const char* path, const char* imgName);
+
+	void log(const char* format, ...);
+
+public:
 	OcrResult detect(const char* path, const char* imgName,
 		int padding, int maxSideLen,
 		float boxScoreThresh, float boxThresh, float unClipRatio, bool doAngle, bool mostAngle);
@@ -33,20 +36,24 @@ public:
 		float boxScoreThresh, float boxThresh, float unClipRatio, bool doAngle, bool mostAngle);
 
 private:
-	bool isOutputConsole = false;
-	bool isOutputPartImg = false;
-	bool isOutputResultTxt = false;
-	bool isOutputResultImg = false;
-	FILE* resultTxt;
-	DbNet dbNet;
-	AngleNet angleNet;
-	CrnnNet crnnNet;
-
 	std::vector<cv::Mat> getPartImages(cv::Mat& src, std::vector<TextBox>& textBoxes,
-		const char* path, const char* imgName);
+		const char* path, const char* imgName) const;
 
 	OcrResult detect(const char* path, const char* imgName,
 		cv::Mat& src, cv::Rect& originRect, ScaleParam& scale,
 		float boxScoreThresh = 0.6f, float boxThresh = 0.3f,
 		float unClipRatio = 2.0f, bool doAngle = true, bool mostAngle = true);
+
+private:
+	bool _isOutputConsole{ false };
+	bool _isOutputPartImg{ false };
+	bool _isOutputResultTxt{ false };
+	bool _isOutputResultImg{ false };
+
+	FILE* _resultTxt{ nullptr };
+
+private:
+	DbNet _dbNet;
+	AngleNet _angleNet;
+	CrnnNet _crnnNet;
 };

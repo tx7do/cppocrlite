@@ -84,14 +84,6 @@ std::vector<float> substractMeanNormalize(cv::Mat& src, const float* meanVals, c
 
 std::vector<int> getAngleIndexes(std::vector<Angle>& angles);
 
-std::vector<std::string> getInputNames(Ort::Session* session);
-
-std::vector<std::string> getOutputNames(Ort::Session* session);
-
-void getInputName(Ort::Session* session, char*& inputName);
-
-void getOutputName(Ort::Session* session, char*& outputName);
-
 void saveImg(cv::Mat& img, const char* imgPath);
 
 std::string getSrcImgFilePath(const char* path, const char* imgName);

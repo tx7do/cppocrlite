@@ -78,3 +78,7 @@ install(
         FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
         DESTINATION lib/pkgconfig
 )
+
+###############################################
+
+add_subdirectory(examples)

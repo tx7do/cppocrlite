@@ -1,37 +1,30 @@
 #pragma once
 
-#include "ocr_struct.hpp"
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/opencv.hpp>
+#include "ocr_session.hpp"
 
-class AngleNet
+class AngleNet : public Session
 {
 public:
-	AngleNet();
+	AngleNet(bool isOutputAngleImg = false);
 	~AngleNet();
 
-	void setNumThread(int numOfThread);
-
-	void initModel(const std::string& pathStr);
-
-	std::vector<Angle> getAngles(std::vector<cv::Mat>& partImgs, const char* path,
-		const char* imgName, bool doAngle, bool mostAngle);
+public:
+	std::vector<Angle> getAngles(std::vector<cv::Mat>& partImages,
+		const char* path, const char* imgName,
+		bool doAngle, bool mostAngle);
 
 private:
-	bool isOutputAngleImg = false;
-
-	Ort::Session* session;
-	Ort::Env env = Ort::Env(ORT_LOGGING_LEVEL_ERROR, "AngleNet");
-	Ort::SessionOptions sessionOptions = Ort::SessionOptions();
-	int numThread = 0;
-
-	char* inputName;
-	char* outputName;
-
-	const float meanValues[3] = { 127.5, 127.5, 127.5 };
-	const float normValues[3] = { 1.0 / 127.5, 1.0 / 127.5, 1.0 / 127.5 };
-	const int dstWidth = 192;
-	const int dstHeight = 32;
-
 	Angle getAngle(cv::Mat& src);
+
+private:
+	bool _isOutputAngleImg = false;
+
+private:
+	static const float MEAN_VALUES[3];
+	static const float NORM_VALUES[3];
+
+	static const int ANGLE_DST_WIDTH;
+	static const int ANGLE_DST_HEIGHT;
 };

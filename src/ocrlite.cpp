@@ -2,67 +2,81 @@
 #include "ocr_utils.hpp"
 #include <cstdarg> // windows & linux
 
-OcrLite::OcrLite()
-{
-}
+OcrLite::OcrLite() = default;
 
 OcrLite::~OcrLite()
 {
-	if (isOutputResultTxt)
+	if (_resultTxt != nullptr)
 	{
-		fclose(resultTxt);
+		fclose(_resultTxt);
+		_resultTxt = nullptr;
 	}
 }
 
 void OcrLite::setNumThread(int numOfThread)
 {
-	dbNet.setNumThread(numOfThread);
-	angleNet.setNumThread(numOfThread);
-	crnnNet.setNumThread(numOfThread);
+	_dbNet.setNumThread(numOfThread);
+	_angleNet.setNumThread(numOfThread);
+	_crnnNet.setNumThread(numOfThread);
 }
 
 void OcrLite::initLogger(bool isConsole, bool isPartImg, bool isResultImg)
 {
-	isOutputConsole = isConsole;
-	isOutputPartImg = isPartImg;
-	isOutputResultImg = isResultImg;
+	_isOutputConsole = isConsole;
+	_isOutputPartImg = isPartImg;
+	_isOutputResultImg = isResultImg;
 }
 
 void OcrLite::enableResultTxt(const char* path, const char* imgName)
 {
-	isOutputResultTxt = true;
+	_isOutputResultTxt = true;
 	std::string resultTxtPath = getResultTxtFilePath(path, imgName);
 	printf("resultTxtPath(%s)\n", resultTxtPath.c_str());
-	resultTxt = fopen(resultTxtPath.c_str(), "w");
+	_resultTxt = fopen(resultTxtPath.c_str(), "w");
 }
 
 bool OcrLite::initModels(const std::string& detPath, const std::string& clsPath,
 	const std::string& recPath, const std::string& keysPath)
 {
-	Logger("=====Init Models=====\n");
-	Logger("--- Init DbNet ---\n");
-	dbNet.initModel(detPath);
+	log("=====Init Models=====\n");
 
-	Logger("--- Init AngleNet ---\n");
-	angleNet.initModel(clsPath);
+	log("--- Init DbNet ---\n");
+	if (!_dbNet.initModel(detPath))
+	{
+		return false;
+	}
 
-	Logger("--- Init CrnnNet ---\n");
-	crnnNet.initModel(recPath, keysPath);
+	log("--- Init AngleNet ---\n");
+	if (!_angleNet.initModel(clsPath))
+	{
+		return false;
+	}
 
-	Logger("Init Models Success!\n");
+	log("--- Init CrnnNet ---\n");
+	if (!_crnnNet.initModel(recPath))
+	{
+		return false;
+	}
+	if (!_crnnNet.loadKeys(keysPath))
+	{
+		return false;
+	}
+
+	log("Init Models Success!\n");
+
 	return true;
 }
 
-void OcrLite::Logger(const char* format, ...)
+void OcrLite::log(const char* format, ...)
 {
-	if (!(isOutputConsole || isOutputResultTxt)) return;
+	if (!(_isOutputConsole || _isOutputResultTxt)) return;
 	char* buffer = (char*)malloc(8192);
 	va_list args;
 	va_start(args, format);
 	vsprintf(buffer, format, args);
 	va_end(args);
-	if (isOutputConsole) printf("%s", buffer);
-	if (isOutputResultTxt) fprintf(resultTxt, "%s", buffer);
+	if (_isOutputConsole) printf("%s", buffer);
+	if (_isOutputResultTxt) fprintf(_resultTxt, "%s", buffer);
 	free(buffer);
 }
 
@@ -77,7 +91,8 @@ cv::Mat makePadding(cv::Mat& src, const int padding)
 
 OcrResult OcrLite::detect(const char* path, const char* imgName,
 	const int padding, const int maxSideLen,
-	float boxScoreThresh, float boxThresh, float unClipRatio, bool doAngle, bool mostAngle)
+	float boxScoreThresh, float boxThresh, float unClipRatio,
+	bool doAngle, bool mostAngle)
 {
 	std::string imgFile = getSrcImgFilePath(path, imgName);
 
@@ -105,13 +120,9 @@ OcrResult OcrLite::detect(const char* path, const char* imgName,
 }
 
 OcrResult OcrLite::detect(const cv::Mat& mat,
-	int padding,
-	int maxSideLen,
-	float boxScoreThresh,
-	float boxThresh,
-	float unClipRatio,
-	bool doAngle,
-	bool mostAngle)
+	int padding, int maxSideLen,
+	float boxScoreThresh, float boxThresh, float unClipRatio,
+	bool doAngle, bool mostAngle)
 {
 	cv::Mat originSrc;
 	cvtColor(mat, originSrc, cv::COLOR_BGR2RGB);// convert to RGB
@@ -130,13 +141,13 @@ OcrResult OcrLite::detect(const cv::Mat& mat,
 	cv::Mat paddingSrc = makePadding(originSrc, padding);
 	ScaleParam scale = getScaleParam(paddingSrc, resize);
 	OcrResult result;
-	result = detect(NULL, NULL, paddingSrc, paddingRect, scale,
+	result = detect(nullptr, nullptr, paddingSrc, paddingRect, scale,
 		boxScoreThresh, boxThresh, unClipRatio, doAngle, mostAngle);
 	return result;
 }
 
 std::vector<cv::Mat> OcrLite::getPartImages(cv::Mat& src, std::vector<TextBox>& textBoxes,
-	const char* path, const char* imgName)
+	const char* path, const char* imgName) const
 {
 	std::vector<cv::Mat> partImages;
 	for (size_t i = 0; i < textBoxes.size(); ++i)
@@ -144,9 +155,9 @@ std::vector<cv::Mat> OcrLite::getPartImages(cv::Mat& src, std::vector<TextBox>& 
 		cv::Mat partImg = getRotateCropImage(src, textBoxes[i].boxPoint);
 		partImages.emplace_back(partImg);
 		//OutPut DebugImg
-		if (isOutputPartImg)
+		if (_isOutputPartImg)
 		{
-			std::string debugImgFile = getDebugImgFilePath(path, imgName, i, "-part-");
+			std::string debugImgFile = getDebugImgFilePath(path, imgName, (int)i, "-part-");
 			saveImg(partImg, debugImgFile.c_str());
 		}
 	}
@@ -155,27 +166,28 @@ std::vector<cv::Mat> OcrLite::getPartImages(cv::Mat& src, std::vector<TextBox>& 
 
 OcrResult OcrLite::detect(const char* path, const char* imgName,
 	cv::Mat& src, cv::Rect& originRect, ScaleParam& scale,
-	float boxScoreThresh, float boxThresh, float unClipRatio, bool doAngle, bool mostAngle)
+	float boxScoreThresh, float boxThresh, float unClipRatio,
+	bool doAngle, bool mostAngle)
 {
 	cv::Mat textBoxPaddingImg = src.clone();
 	int thickness = getThickness(src);
 
-	Logger("=====Start detect=====\n");
-	Logger("ScaleParam(sw:%d,sh:%d,dw:%d,dh:%d,%f,%f)\n",
+	log("=====Start detect=====\n");
+	log("ScaleParam(sw:%d,sh:%d,dw:%d,dh:%d,%f,%f)\n",
 		scale.srcWidth, scale.srcHeight,
 		scale.dstWidth, scale.dstHeight,
 		scale.ratioWidth, scale.ratioHeight);
 
-	Logger("---------- step: dbNet getTextBoxes ----------\n");
+	log("---------- step: dbNet getTextBoxes ----------\n");
 	double startTime = getCurrentTime();
-	std::vector<TextBox> textBoxes = dbNet.getTextBoxes(src, scale, boxScoreThresh, boxThresh, unClipRatio);
+	std::vector<TextBox> textBoxes = _dbNet.getTextBoxes(src, scale, boxScoreThresh, boxThresh, unClipRatio);
 	double endDbNetTime = getCurrentTime();
 	double dbNetTime = endDbNetTime - startTime;
-	Logger("dbNetTime(%fms)\n", dbNetTime);
+	log("dbNetTime(%fms)\n", dbNetTime);
 
 	for (size_t i = 0; i < textBoxes.size(); ++i)
 	{
-		Logger("TextBox[%d](+padding)[score(%f),[x: %d, y: %d], [x: %d, y: %d], [x: %d, y: %d], [x: %d, y: %d]]\n", i,
+		log("TextBox[%d](+padding)[score(%f),[x: %d, y: %d], [x: %d, y: %d], [x: %d, y: %d], [x: %d, y: %d]]\n", i,
 			textBoxes[i].score,
 			textBoxes[i].boxPoint[0].x, textBoxes[i].boxPoint[0].y,
 			textBoxes[i].boxPoint[1].x, textBoxes[i].boxPoint[1].y,
@@ -183,20 +195,20 @@ OcrResult OcrLite::detect(const char* path, const char* imgName,
 			textBoxes[i].boxPoint[3].x, textBoxes[i].boxPoint[3].y);
 	}
 
-	Logger("---------- step: drawTextBoxes ----------\n");
+	log("---------- step: drawTextBoxes ----------\n");
 	drawTextBoxes(textBoxPaddingImg, textBoxes, thickness);
 
 	//---------- getPartImages ----------
 	std::vector<cv::Mat> partImages = getPartImages(src, textBoxes, path, imgName);
 
-	Logger("---------- step: angleNet getAngles ----------\n");
+	log("---------- step: angleNet getAngles ----------\n");
 	std::vector<Angle> angles;
-	angles = angleNet.getAngles(partImages, path, imgName, doAngle, mostAngle);
+	angles = _angleNet.getAngles(partImages, path, imgName, doAngle, mostAngle);
 
 	//Log Angles
 	for (size_t i = 0; i < angles.size(); ++i)
 	{
-		Logger("angle[%d][index(%d), score(%f), time(%fms)]\n", i, angles[i].index, angles[i].score, angles[i].time);
+		log("angle[%d][index(%d), score(%f), time(%fms)]\n", i, angles[i].index, angles[i].score, angles[i].time);
 	}
 
 	//Rotate partImgs
@@ -208,12 +220,12 @@ OcrResult OcrLite::detect(const char* path, const char* imgName,
 		}
 	}
 
-	Logger("---------- step: crnnNet getTextLine ----------\n");
-	std::vector<TextLine> textLines = crnnNet.getTextLines(partImages, path, imgName);
+	log("---------- step: crnnNet getTextLine ----------\n");
+	std::vector<TextLine> textLines = _crnnNet.getTextLines(partImages, path, imgName);
 	//Log TextLines
 	for (size_t i = 0; i < textLines.size(); ++i)
 	{
-		Logger("textLine[%d](%s)\n", i, textLines[i].text.c_str());
+		log("textLine[%d](%s)\n", i, textLines[i].text.c_str());
 		std::ostringstream txtScores;
 		for (size_t s = 0; s < textLines[i].charScores.size(); ++s)
 		{
@@ -226,8 +238,8 @@ OcrResult OcrLite::detect(const char* path, const char* imgName,
 				txtScores << " ," << textLines[i].charScores[s];
 			}
 		}
-		Logger("textScores[%d]{%s}\n", i, std::string(txtScores.str()).c_str());
-		Logger("crnnTime[%d](%fms)\n", i, textLines[i].time);
+		log("textScores[%d]{%s}\n", i, std::string(txtScores.str()).c_str());
+		log("crnnTime[%d](%fms)\n", i, textLines[i].time);
 	}
 
 	std::vector<TextBlock> textBlocks;
@@ -247,8 +259,8 @@ OcrResult OcrLite::detect(const char* path, const char* imgName,
 
 	double endTime = getCurrentTime();
 	double fullTime = endTime - startTime;
-	Logger("=====End detect=====\n");
-	Logger("FullDetectTime(%fms)\n", fullTime);
+	log("=====End detect=====\n");
+	log("FullDetectTime(%fms)\n", fullTime);
 
 	//cropped to original size
 	cv::Mat rgbBoxImg, textBoxImg;
@@ -264,7 +276,7 @@ OcrResult OcrLite::detect(const char* path, const char* imgName,
 	cvtColor(rgbBoxImg, textBoxImg, cv::COLOR_RGB2BGR);//convert to BGR for Output Result Img
 
 	//Save result.jpg
-	if (isOutputResultImg)
+	if (_isOutputResultImg)
 	{
 		std::string resultImgFile = getResultImgFilePath(path, imgName);
 		imwrite(resultImgFile, textBoxImg);

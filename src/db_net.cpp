@@ -1,52 +1,54 @@
 #include "db_net.hpp"
 #include "ocr_utils.hpp"
 
+const float DbNet::MEAN_VALUES[3] = { 0.485 * 255, 0.456 * 255, 0.406 * 255 };
+
+const float DbNet::NORM_VALUES[3] = { 1.0 / 0.229 / 255.0, 1.0 / 0.224 / 255.0, 1.0 / 0.225 / 255.0 };
+
 DbNet::DbNet()
+	: Session("DbNet", ORT_LOGGING_LEVEL_ERROR)
 {
 }
 
-DbNet::~DbNet()
+DbNet::~DbNet() = default;
+
+std::vector<TextBox>
+DbNet::getTextBoxes(cv::Mat& src, ScaleParam& s, float boxScoreThresh, float boxThresh, float unClipRatio)
 {
-	delete session;
-	free(inputName);
-	free(outputName);
+	cv::Mat srcResize;
+	resize(src, srcResize, cv::Size(s.dstWidth, s.dstHeight));
+
+	std::vector<float> inputTensorValues = substractMeanNormalize(srcResize, MEAN_VALUES, NORM_VALUES);
+	std::array<int64_t, 4> inputShape{ 1, srcResize.channels(), srcResize.rows, srcResize.cols };
+
+	auto memoryInfo = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
+	Ort::Value inputTensor = Ort::Value::CreateTensor<float>(memoryInfo, inputTensorValues.data(),
+		inputTensorValues.size(), inputShape.data(),
+		inputShape.size());
+	assert(inputTensor.IsTensor());
+
+	auto& outputTensor = Session::run(&inputTensor, 1, 1);
+	assert(outputTensor.size() == 1 && outputTensor.front().IsTensor());
+
+	std::vector<int64_t> outputShape = outputTensor[0].GetTensorTypeAndShapeInfo().GetShape();
+	int64_t outputCount = std::accumulate(outputShape.begin(), outputShape.end(), 1,
+		std::multiplies<int64_t>());
+
+	auto* floatArray = outputTensor.front().GetTensorMutableData<float>();
+
+	//-----Data preparation-----
+	cv::Mat fMapMat(srcResize.rows, srcResize.cols, CV_32FC1);
+	memcpy(fMapMat.data, floatArray, outputCount * sizeof(float));
+
+	//-----boxThresh-----
+	cv::Mat norfMapMat;
+	norfMapMat = fMapMat > boxThresh;
+
+	return findRsBoxes(fMapMat, norfMapMat, s, boxScoreThresh, unClipRatio);
 }
 
-void DbNet::setNumThread(int numOfThread)
-{
-	numThread = numOfThread;
-	//===session options===
-	// Sets the number of threads used to parallelize the execution within nodes
-	// A value of 0 means ORT will pick a default
-	//sessionOptions.SetIntraOpNumThreads(numThread);
-	//set OMP_NUM_THREADS=16
-
-	// Sets the number of threads used to parallelize the execution of the graph (across nodes)
-	// If sequential execution is enabled this value is ignored
-	// A value of 0 means ORT will pick a default
-	sessionOptions.SetInterOpNumThreads(numThread);
-
-	// Sets graph optimization level
-	// ORT_DISABLE_ALL -> To disable all optimizations
-	// ORT_ENABLE_BASIC -> To enable basic optimizations (Such as redundant node removals)
-	// ORT_ENABLE_EXTENDED -> To enable extended optimizations (Includes level 1 + more complex optimizations like node fusions)
-	// ORT_ENABLE_ALL -> To Enable All possible opitmizations
-	sessionOptions.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
-}
-
-void DbNet::initModel(const std::string& pathStr)
-{
-#ifdef _WIN32
-	std::wstring dbPath = strToWstr(pathStr);
-	session = new Ort::Session(env, dbPath.c_str(), sessionOptions);
-#else
-	session = new Ort::Session(env, pathStr.c_str(), sessionOptions);
-#endif
-	getInputName(session, inputName);
-	getOutputName(session, outputName);
-}
-
-std::vector<TextBox> findRsBoxes(const cv::Mat& fMapMat, const cv::Mat& norfMapMat, ScaleParam& s,
+std::vector<TextBox> DbNet::findRsBoxes(const cv::Mat& fMapMat, const cv::Mat& norfMapMat,
+	ScaleParam& s,
 	const float boxScoreThresh, const float unClipRatio)
 {
 	float minArea = 3;
@@ -59,24 +61,30 @@ std::vector<TextBox> findRsBoxes(const cv::Mat& fMapMat, const cv::Mat& norfMapM
 		float minSideLen, perimeter;
 		std::vector<cv::Point> minBox = getMinBoxes(contour, minSideLen, perimeter);
 		if (minSideLen < minArea)
+		{
 			continue;
+		}
 		float score = boxScoreFast(fMapMat, contour);
 		if (score < boxScoreThresh)
+		{
 			continue;
+		}
 		//---use clipper start---
 		std::vector<cv::Point> clipBox = unClip(minBox, perimeter, unClipRatio);
 		std::vector<cv::Point> clipMinBox = getMinBoxes(clipBox, minSideLen, perimeter);
 		//---use clipper end---
 
 		if (minSideLen < minArea + 2)
+		{
 			continue;
+		}
 
 		for (auto& j : clipMinBox)
 		{
-			j.x = (j.x / s.ratioWidth);
+			j.x = (j.x / (int)s.ratioWidth);
 			j.x = (std::min)((std::max)(j.x, 0), s.srcWidth);
 
-			j.y = (j.y / s.ratioHeight);
+			j.y = (j.y / (int)s.ratioHeight);
 			j.y = (std::min)((std::max)(j.y, 0), s.srcHeight);
 		}
 
@@ -84,34 +92,4 @@ std::vector<TextBox> findRsBoxes(const cv::Mat& fMapMat, const cv::Mat& norfMapM
 	}
 	reverse(rsBoxes.begin(), rsBoxes.end());
 	return rsBoxes;
-}
-
-std::vector<TextBox>
-DbNet::getTextBoxes(cv::Mat& src, ScaleParam& s, float boxScoreThresh, float boxThresh, float unClipRatio)
-{
-	cv::Mat srcResize;
-	resize(src, srcResize, cv::Size(s.dstWidth, s.dstHeight));
-	std::vector<float> inputTensorValues = substractMeanNormalize(srcResize, meanValues, normValues);
-	std::array<int64_t, 4> inputShape{ 1, srcResize.channels(), srcResize.rows, srcResize.cols };
-	auto memoryInfo = Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU);
-	Ort::Value inputTensor = Ort::Value::CreateTensor<float>(memoryInfo, inputTensorValues.data(),
-		inputTensorValues.size(), inputShape.data(),
-		inputShape.size());
-	assert(inputTensor.IsTensor());
-	auto outputTensor = session->Run(Ort::RunOptions{ nullptr }, &inputName, &inputTensor, 1, &outputName, 1);
-	assert(outputTensor.size() == 1 && outputTensor.front().IsTensor());
-	std::vector<int64_t> outputShape = outputTensor[0].GetTensorTypeAndShapeInfo().GetShape();
-	int64_t outputCount = std::accumulate(outputShape.begin(), outputShape.end(), 1,
-		std::multiplies<int64_t>());
-	float* floatArray = outputTensor.front().GetTensorMutableData<float>();
-
-	//-----Data preparation-----
-	cv::Mat fMapMat(srcResize.rows, srcResize.cols, CV_32FC1);
-	memcpy(fMapMat.data, floatArray, outputCount * sizeof(float));
-
-	//-----boxThresh-----
-	cv::Mat norfMapMat;
-	norfMapMat = fMapMat > boxThresh;
-
-	return findRsBoxes(fMapMat, norfMapMat, s, boxScoreThresh, unClipRatio);
 }
