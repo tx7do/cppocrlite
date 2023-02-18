@@ -34,7 +34,7 @@ public:
 	void log(const char* format, ...);
 
 public:
-	/// 识别图片
+	/// 识别图片（文件）
 	/// @param [in] imgPath 目标图片路径，可以相对路径也可以绝对路径。
 	/// @param [in] imgName 图片的文件名
 	/// @param [in] padding 图像预处理，在图片外周添加白边，用于提升识别率，文字框没有正确框住所有文字时，增加此值。
@@ -48,7 +48,15 @@ public:
 		int padding, int maxSideLen,
 		float boxScoreThresh, float boxThresh, float unClipRatio, bool doAngle, bool mostAngle);
 
-	/// 识别
+	/// 识别图片（矩阵）
+	/// @param [in] mat 图形矩阵，可以从文件，也可以从内存中读取。
+	/// @param [in] padding 图像预处理，在图片外周添加白边，用于提升识别率，文字框没有正确框住所有文字时，增加此值。
+	/// @param [in] maxSideLen 按图片最长边的长度，此值为0代表不缩放，例：1024，如果图片长边大于1024则把图像整体缩小到1024再进行图像分割计算，如果图片长边小于1024则不缩放，如果图片长边小于32，则缩放到32。
+	/// @param [in] boxScoreThresh 文字框置信度阈值，文字框没有正确框住所有文字时，减小此值。
+	/// @param [in] boxThresh
+	/// @param [in] unClipRatio 单个文字框大小倍率，越大时单个文字框越大。此项与图片的大小相关，越大的图片此值应该越大。
+	/// @param [in] doAngle 启用文字方向检测，只有图片倒置的情况下(旋转90~270度的图片)，才需要启用文字方向检测。
+	/// @param [in] mostAngle
 	OcrResult detect(const cv::Mat& mat,
 		int padding, int maxSideLen,
 		float boxScoreThresh, float boxThresh, float unClipRatio, bool doAngle, bool mostAngle);
