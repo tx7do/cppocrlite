@@ -1,16 +1,17 @@
-#include <cstdio>
 #include "ocrlite.hpp"
 
-int main(int argc, char** argv)
+int main()
 {
-	std::string
-		modelDetPath("../models/dbnet.onnx"),
-		modelClsPath("../models/angle_net.onnx"),
-		modelRecPath("../models/crnn_lite_lstm.onnx"),
-		keysPath("../models/keys.txt");
+	std::string modelPath("../../models/");
 
 	std::string
-		imgDir("_fixtures/"),
+		modelDetPath(modelPath + "dbnet.onnx"),
+		modelClsPath(modelPath + "angle_net.onnx"),
+		modelRecPath(modelPath + "crnn_lite_lstm.onnx"),
+		keysPath(modelPath + "keys.txt");
+
+	std::string
+		imgDir("../_fixtures/"),
 		imgName("2.jpg");
 
 	int numThread = 4;
