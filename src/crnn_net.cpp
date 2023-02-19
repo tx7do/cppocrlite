@@ -48,7 +48,7 @@ bool CrnnNet::loadKeys(const std::string& keysPath)
 		fprintf(stderr, "missing keys\n");
 		return false;
 	}
-	printf("total keys size(%lu)\n", _keys.size());
+	// printf("total keys size(%lu)\n", _keys.size());
 
 	return true;
 }

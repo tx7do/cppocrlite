@@ -389,11 +389,11 @@ std::string getResultImgFilePath(const char* path, const char* imgName)
 	}
 	else
 	{
-		time_t timep;
-		time(&timep);
-		char tmp[256];
-		strftime(tmp, sizeof(tmp), "%Y-%m-%d-%H-%M-%S", localtime(&timep));
-		filePath.append(tmp).append("-result.jpg");
+		time_t tm;
+		time(&tm);
+		char tmp[256] = {};
+		strftime(tmp, sizeof(tmp), "%Y%m%d%H%M%S", localtime(&tm));
+		filePath.append("./").append(tmp).append("-result.jpg");
 	}
 
 	return filePath;
