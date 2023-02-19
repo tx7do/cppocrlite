@@ -117,7 +117,7 @@ void Session::readInputNames()
 	for (size_t i = 0; i < numInputNodes; ++i)
 	{
 		auto inputName = _session->GetInputNameAllocated(i, _allocator);
-		std::cout << "Input " << i << " : name =" << inputName.get() << std::endl;
+		// std::cout << "Input " << i << " : name =" << inputName.get() << std::endl;
 		_inputNodeNames.push_back(inputName.get());
 		_inputNamePtrs.push_back(std::move(inputName));
 	}
@@ -145,7 +145,7 @@ void Session::readOutputNames()
 	for (size_t i = 0; i < numOutputNodes; ++i)
 	{
 		auto outputName = _session->GetOutputNameAllocated(i, _allocator);
-		std::cout << "Output " << i << " : name =" << outputName.get() << std::endl;
+		// std::cout << "Output " << i << " : name =" << outputName.get() << std::endl;
 		_outputNodeNames.push_back(outputName.get());
 		_outputNamePtrs.push_back(std::move(outputName));
 	}
