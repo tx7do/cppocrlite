@@ -20,18 +20,18 @@ void OcrLite::setNumThread(int numOfThread)
 	_crnnNet.setNumThread(numOfThread);
 }
 
-void OcrLite::initLogger(bool isConsole, bool isPartImg, bool isResultImg)
+void OcrLite::initLogger(bool isOutputConsole, bool isOutputPartImg, bool isOutputResultImg)
 {
-	_isOutputConsole = isConsole;
-	_isOutputPartImg = isPartImg;
-	_isOutputResultImg = isResultImg;
+	_isOutputConsole = isOutputConsole;
+	_isOutputPartImg = isOutputPartImg;
+	_isOutputResultImg = isOutputResultImg;
 }
 
 void OcrLite::enableResultTxt(const char* path, const char* imgName)
 {
 	_isOutputResultTxt = true;
 	std::string resultTxtPath = getResultTxtFilePath(path, imgName);
-	printf("resultTxtPath(%s)\n", resultTxtPath.c_str());
+	log("resultTxtPath(%s)\n", resultTxtPath.c_str());
 	_resultTxt = fopen(resultTxtPath.c_str(), "w");
 }
 

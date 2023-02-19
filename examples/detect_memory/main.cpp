@@ -28,12 +28,9 @@ int main()
 
 	OcrLite ocrLite;
 	ocrLite.setNumThread(numThread);
-	ocrLite.initLogger(
-		true,//isOutputConsole
-		false,//isOutputPartImg
-		true);//isOutputResultImg
+	ocrLite.initLogger(true, false, true);
 
-	ocrLite.enableResultTxt("memory/", "images");
+	ocrLite.enableResultTxt("./", "memory.jpg");
 	ocrLite.log("=====Input Params=====\n");
 	ocrLite.log(
 		"numThread(%d),padding(%d),maxSideLen(%d),boxScoreThresh(%f),boxThresh(%f),unClipRatio(%f),doAngle(%d),mostAngle(%d)\n",
