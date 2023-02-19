@@ -69,7 +69,7 @@ int main()
 	cv::Mat matImg;
 	try
 	{
-		matImg = cv::imdecode(cv::Mat(buff), CV_LOAD_IMAGE_COLOR);
+		matImg = cv::imdecode(cv::Mat(buff), CV_LOAD_IMAGE_UNCHANGED);
 	}
 	catch (std::exception& e)
 	{
