@@ -382,7 +382,20 @@ std::string getResultTxtFilePath(const char* path, const char* imgName)
 std::string getResultImgFilePath(const char* path, const char* imgName)
 {
 	std::string filePath;
-	filePath.append(path).append(imgName).append("-result.jpg");
+
+	if (path != nullptr && imgName != nullptr)
+	{
+		filePath.append(path).append(imgName).append("-result.jpg");
+	}
+	else
+	{
+		time_t timep;
+		time(&timep);
+		char tmp[256];
+		strftime(tmp, sizeof(tmp), "%Y-%m-%d-%H-%M-%S", localtime(&timep));
+		filePath.append(tmp).append("-result.jpg");
+	}
+
 	return filePath;
 }
 
