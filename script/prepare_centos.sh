@@ -1,21 +1,25 @@
 #!/usr/bin/env bash
 
-sudo apt update && sudo apt upgrade
+yum update && yum upgrade
 
 # install CMake
-sudo apt install cmake
+yum install cmake
 
 # install gcc
-sudo apt install build-essential
+yum install \
+            autoconf automake binutils \
+            bison flex gcc gcc-c++ gettext \
+            libtool make patch pkgconfig \
+            redhat-rpm-config rpm-build rpm-sign \
+            ctags elfutils indent patchutils
 
 # install image lib
-sudo apt install libjpeg-dev libtiff-dev libpng-dev
+yum install \
+          libjpeg-devel libtiff-devel libpng-devel\
+          libjpeg libtiff libpng
 
 # install OpenCV
-sudo apt install libopencv-dev
-
-# install OpenMP
-sudo apt install libomp-dev
+yum install opencv opencv-devel
 
 # install OnnxRuntime
 REPO="microsoft/onnxruntime"
