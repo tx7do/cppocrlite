@@ -2,16 +2,9 @@
 
 yum update && yum upgrade
 
-# install CMake
-yum install cmake
-
-# install gcc
-yum install \
-            autoconf automake binutils \
-            bison flex gcc gcc-c++ gettext \
-            libtool make patch pkgconfig \
-            redhat-rpm-config rpm-build rpm-sign \
-            ctags elfutils indent patchutils
+# Install Building Tool
+yum groupinstall "Development Tools" -y
+yum install cmake3 gcc gtk2-devel numpy pkconfig -y
 
 # install image lib
 yum install \
@@ -19,7 +12,17 @@ yum install \
           libjpeg libtiff libpng
 
 # install OpenCV
-yum install opencv opencv-devel
+wget https://github.com/opencv/opencv/archive/4.2.0.zip
+unzip 4.2.0.zip
+cd opencv-4.2.0
+mkdir build
+cd build
+cmake3 -D CMAKE_BUILD_TYPE=DEBUG -D CMAKE_INSTALL_PREFIX=/usr/local ..
+make
+make install
+export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig/
+echo '/usr/local/lib/' >> /etc/ld.so.conf.d/opencv.conf
+ldconfig
 
 # install OnnxRuntime
 REPO="microsoft/onnxruntime"
