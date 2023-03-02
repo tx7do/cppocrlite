@@ -1,6 +1,5 @@
 #include "ocrlite.hpp"
 
-
 #include <onnxruntime_cxx_api.h>
 
 #include "ocr_utils.hpp"
@@ -219,14 +218,10 @@ OcrResult OcrLite::detect(const char* path, const char* imgName,
 			->log("TextBox[%d](+padding)[score(%f),[x: %d, y: %d], [x: %d, y: %d], [x: %d, y: %d], [x: %d, y: %d]]",
 				i,
 				textBoxes[i].score,
-				textBoxes[i].boxPoint[0].x,
-				textBoxes[i].boxPoint[0].y,
-				textBoxes[i].boxPoint[1].x,
-				textBoxes[i].boxPoint[1].y,
-				textBoxes[i].boxPoint[2].x,
-				textBoxes[i].boxPoint[2].y,
-				textBoxes[i].boxPoint[3].x,
-				textBoxes[i].boxPoint[3].y);
+				textBoxes[i].boxPoint[0].x, textBoxes[i].boxPoint[0].y,
+				textBoxes[i].boxPoint[1].x, textBoxes[i].boxPoint[1].y,
+				textBoxes[i].boxPoint[2].x, textBoxes[i].boxPoint[2].y,
+				textBoxes[i].boxPoint[3].x, textBoxes[i].boxPoint[3].y);
 	}
 
 	_logger->log("---------- step: drawTextBoxes ----------");
