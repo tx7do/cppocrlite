@@ -1,5 +1,6 @@
 #include "db_net.hpp"
 #include "ocr_utils.hpp"
+#include <onnxruntime_cxx_api.h>
 
 const float DbNet::MEAN_VALUES[3] = { 0.485f * 255, 0.456f * 255, 0.406f * 255 };
 

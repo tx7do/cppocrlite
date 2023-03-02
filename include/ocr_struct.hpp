@@ -1,33 +1,35 @@
 #pragma once
 
-#include "opencv2/core.hpp"
+#include <opencv2/core.hpp>
 #include <vector>
 #include "ocrlite_port.hpp"
 
-struct ScaleParam
+struct OCRLITE_PORT ScaleParam
 {
 	int srcWidth;
 	int srcHeight;
+
 	int dstWidth;
 	int dstHeight;
+
 	float ratioWidth;
 	float ratioHeight;
 };
 
-struct TextBox
+struct OCRLITE_PORT TextBox
 {
 	std::vector<cv::Point> boxPoint;
 	float score;
 };
 
-struct Angle
+struct OCRLITE_PORT Angle
 {
 	int index;
 	float score;
 	double time;
 };
 
-struct TextLine
+struct OCRLITE_PORT TextLine
 {
 	std::string text;
 	std::vector<float> charScores;
@@ -36,22 +38,28 @@ struct TextLine
 
 struct OCRLITE_PORT TextBlock
 {
-	std::vector<cv::Point> boxPoint;
-	float boxScore;
-	int angleIndex;
-	float angleScore;
 	double angleTime;
-	std::string text;
-	std::vector<float> charScores;
 	double crnnTime;
 	double blockTime;
+
+	std::vector<cv::Point> boxPoint;
+	float boxScore;
+
+	int angleIndex;
+	float angleScore;
+
+	std::vector<float> charScores;
+
+	std::string text;
 };
 
 struct OCRLITE_PORT OcrResult
 {
 	double dbNetTime;
+	double detectTime;
+
 	std::vector<TextBlock> textBlocks;
 	cv::Mat boxImg;
-	double detectTime;
+
 	std::string strRes;
 };

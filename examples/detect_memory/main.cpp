@@ -1,5 +1,7 @@
 #include "ocrlite.hpp"
+
 #include <fstream>
+#include <iostream>
 
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgcodecs/legacy/constants_c.h>
@@ -30,10 +32,10 @@ int main()
 	ocrLite.setNumThread(numThread);
 	ocrLite.initLogger(true, false, true);
 
-	ocrLite.enableResultTxt("./", "memory.jpg");
-	ocrLite.log("=====Input Params=====\n");
+	ocrLite.enableFileLogger("./", "memory.jpg");
+	ocrLite.log("=====Input Params=====");
 	ocrLite.log(
-		"numThread(%d),padding(%d),maxSideLen(%d),boxScoreThresh(%f),boxThresh(%f),unClipRatio(%f),doAngle(%d),mostAngle(%d)\n",
+		"numThread(%d),padding(%d),maxSideLen(%d),boxScoreThresh(%f),boxThresh(%f),unClipRatio(%f),doAngle(%d),mostAngle(%d)",
 		numThread,
 		padding,
 		maxSideLen,
@@ -76,6 +78,7 @@ int main()
 
 	OcrResult result = ocrLite.detect(matImg, padding, maxSideLen,
 		boxScoreThresh, boxThresh, unClipRatio, doAngle, mostAngle);
+
 	ocrLite.log("%s\n", result.strRes.c_str());
 
 	return 0;

@@ -1,6 +1,8 @@
 #include "angle_net.hpp"
 #include "ocr_utils.hpp"
 #include <numeric>
+#include <onnxruntime_cxx_api.h>
+
 
 const float AngleNet::MEAN_VALUES[3] = { 127.5f, 127.5f, 127.5f };
 

@@ -1,4 +1,5 @@
 #include "ocrlite.hpp"
+#include <iostream>
 
 int main()
 {
@@ -31,10 +32,10 @@ int main()
 		false,//isOutputPartImg
 		true);//isOutputResultImg
 
-	ocrLite.enableResultTxt(imgDir.c_str(), imgName.c_str());
-	ocrLite.log("=====Input Params=====\n");
+	ocrLite.enableFileLogger(imgDir.c_str(), imgName.c_str());
+	ocrLite.log("=====Input Params=====");
 	ocrLite.log(
-		"numThread(%d),padding(%d),maxSideLen(%d),boxScoreThresh(%f),boxThresh(%f),unClipRatio(%f),doAngle(%d),mostAngle(%d)\n",
+		"numThread(%d),padding(%d),maxSideLen(%d),boxScoreThresh(%f),boxThresh(%f),unClipRatio(%f),doAngle(%d),mostAngle(%d)",
 		numThread,
 		padding,
 		maxSideLen,
@@ -48,6 +49,7 @@ int main()
 
 	OcrResult result = ocrLite.detect(imgDir.c_str(), imgName.c_str(), padding, maxSideLen,
 		boxScoreThresh, boxThresh, unClipRatio, doAngle, mostAngle);
+
 	ocrLite.log("%s\n", result.strRes.c_str());
 
 	return 0;

@@ -1,11 +1,13 @@
 #pragma once
 
-#include "opencv2/core.hpp"
-#include <onnxruntime_cxx_api.h>
+#include <opencv2/core.hpp>
 #include "ocr_struct.hpp"
-#include "db_net.hpp"
-#include "angle_net.hpp"
-#include "crnn_net.hpp"
+
+
+class DbNet;
+class AngleNet;
+class CrnnNet;
+class OcrLogger;
 
 class OcrLite
 {
@@ -29,7 +31,11 @@ public:
 public:
 	void initLogger(bool isConsole, bool isPartImg, bool isResultImg);
 
-	void enableResultTxt(const char* path, const char* imgName);
+	void enableOutputPartImage(bool enable);
+	void enableOutputResultImage(bool enable);
+
+	void enableConsoleLogger(bool enable);
+	void enableFileLogger(const char* path, const char* imgName);
 
 	void log(const char* format, ...);
 
@@ -71,15 +77,14 @@ private:
 		float unClipRatio = 2.0f, bool doAngle = true, bool mostAngle = true);
 
 private:
-	bool _isOutputConsole{ false };
 	bool _isOutputPartImg{ false };
-	bool _isOutputResultTxt{ false };
 	bool _isOutputResultImg{ false };
 
-	FILE* _resultTxt{ nullptr };
+private:
+	OcrLogger* _logger{ nullptr };
 
 private:
-	DbNet _dbNet;
-	AngleNet _angleNet;
-	CrnnNet _crnnNet;
+	DbNet* _dbNet{ nullptr };
+	AngleNet* _angleNet{ nullptr };
+	CrnnNet* _crnnNet{ nullptr };
 };

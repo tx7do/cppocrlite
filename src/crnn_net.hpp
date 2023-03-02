@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ocr_struct.hpp"
-#include <onnxruntime_cxx_api.h>
 #include <opencv2/opencv.hpp>
 #include "ocr_session.hpp"
 

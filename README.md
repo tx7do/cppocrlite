@@ -59,5 +59,6 @@ check installation state:
 
 ```shell
 pkg-config --cflags --libs onnxruntime
+pkg-config --cflags --libs opencv4
 pkg-config --cflags --libs cppocrlite
 ```

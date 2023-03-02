@@ -2,6 +2,7 @@
 #include "ocr_utils.hpp"
 #include <fstream>
 #include <numeric>
+#include <onnxruntime_cxx_api.h>
 
 template<class ForwardIterator>
 inline static size_t argmax(ForwardIterator first, ForwardIterator last)
@@ -19,6 +20,7 @@ const int CrnnNet::KEY_COLS = 5531;
 CrnnNet::CrnnNet(bool isOutputDebugImg)
 	: Session("CrnnNet", ORT_LOGGING_LEVEL_ERROR), _isOutputDebugImg(isOutputDebugImg)
 {
+	_keys.reserve(KEY_COLS);
 }
 
 CrnnNet::~CrnnNet() = default;
